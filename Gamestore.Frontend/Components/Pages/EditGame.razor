@@ -1,13 +1,15 @@
 ﻿@page "/editgame"
+@page "/editgame/{id:int}"
+
 @inject NavigationManager NavigationManager
 @inject GamesClient GamesClient
 @inject GenresClient GenresClient
 
-<PageTitle>New Game</PageTitle>
+<PageTitle>@title</PageTitle>
 
-<h3>New Game</h3>
+<h3>@title</h3>
 
-@if(genres is null)
+@if(genres is null || game is null)
 {
     <p><em>Loading....</em></p>
 }
@@ -15,10 +17,13 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <EditForm Model="@game" FormName="editGame" OnSubmit="HandleSubmit">
+            <EditForm Model="@game" FormName="editGame" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
                     <InputText id="name" @bind-Value="game.Name" class="form-control" />
+                    <ValidationMessage For="() => game.Name" class="text-danger" />
                 </div>
 
                 <div class="mb-3">
@@ -30,17 +35,19 @@ else
                         <option value="@genre.Id">@genre.Name</option>
                     }
                     </InputSelect>
+                    <ValidationMessage For="() => game.GenreId" class="text-danger" />
                 </div>
 
                 <div class="mb-3">
                     <label for="price" class="form-label">Price</label>
                     <InputNumber id="price" @bind-Value="game.Price" class="form-control" />
+                    <ValidationMessage For="() => game.Price" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="releaseDate" class="form-label">Release Date </label>
                     <InputDate id="releaseDate" @bind-Value="game.ReleaseDate" class="form-control" />
                 </div>  
-                <button type="submit" class="btn btn-primary">Add Game</button>
+                <button type="submit" class="btn btn-primary">Save</button>
                 <a role="btn" class="btn btn-secondary" href="/">Cancel</a>
             </EditForm>
         </div>
@@ -49,14 +56,37 @@ else
 
 @code {
 
+    [Parameter ]
+    public int? id { get; set; }
+
     [SupplyParameterFromForm]
-    private GameDetails game {get; set;} = new()
-    {
-        Name = string.Empty,
-        ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow)
-    };
+    private GameDetails? game {get; set;}
 
     private Genre[]? genres;
+    private string title = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if(game is not null)
+        {
+            return;
+        }
+
+       if (id is not null)
+        {
+            game = GamesClient.GetGame(id.Value);
+            title = $"Editing {game.Name}";
+        }
+        else
+        {   
+            game = new()
+            {
+                Name = string.Empty,
+                ReleaseDate = DateOnly.FromDateTime(DateTime.UtcNow)
+            };
+            title = "New Game";
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -65,7 +95,18 @@ else
 
     private void HandleSubmit()
     {
-        GamesClient.AddGame(game); 
+        ArgumentNullException.ThrowIfNull(game);
+
+        if(id is null)
+        {
+            GamesClient.AddGame(game); 
+        }
+        else
+        {
+            game.Id = id.Value;
+            GamesClient.UpdateGame(game);
+        }       
+
         NavigationManager.NavigateTo("/");
     }
 }
