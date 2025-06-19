@@ -8,19 +8,19 @@ POST http://localhost:5002/games
 Content-Type: application/json
 
 {
-    "name": "Game unknown",
-    "genreId": 2,
-    "price": 3.99,
+    "name": "Game four",
+    "genreId": 3,
+    "price": 34.99,
     "releaseDate": "2025-12-18"
 }
 
 ###
-PUT http://localhost:5002/games/4
+PUT http://localhost:5002/games/3
 Content-Type: application/json
 
 {
     "name": "Game Five",
-    "genreId": 1,
+    "genreId": 2,
     "price": 22.99,
     "releaseDate": "2025-12-18"
 }
