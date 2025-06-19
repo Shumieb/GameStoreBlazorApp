@@ -3,6 +3,8 @@
 *.db-shm
 *.db-wal
 
+*/Data/migrations/*.cs
+
 _build/
 _site/
 
