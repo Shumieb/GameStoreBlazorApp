@@ -7,8 +7,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-builder.Services.AddSingleton<GamesClient>();
-builder.Services.AddSingleton<GenresClient>();
+var gameStoreAPIURL = builder.Configuration["GameStoreApiUrl"] ??
+                        throw new Exception("GameStoreApiUrl is not set.");
+
+builder.Services.AddHttpClient<GamesClient>(
+    client => client.BaseAddress = new Uri(gameStoreAPIURL));
+
+builder.Services.AddHttpClient<GenresClient>(
+    client => client.BaseAddress = new Uri(gameStoreAPIURL));
 
 var app = builder.Build();
 
