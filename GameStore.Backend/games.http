@@ -1,0 +1,30 @@
+GET http://localhost:5002/games
+
+###
+GET http://localhost:5002/games/1
+
+###
+POST http://localhost:5002/games
+Content-Type: application/json
+
+{
+    "name": "Game Twenty",
+    "genre": "RPG",
+    "price": 20.99,
+    "releaseDate": "2025-12-18"
+}
+
+###
+PUT http://localhost:5002/games/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "name": "Game modified",
+    "genre": "Fighting",
+    "price": 1.99,
+    "releaseDate": "2025-05-20"
+}
+
+###
+DELETE http://localhost:5002/games/2
